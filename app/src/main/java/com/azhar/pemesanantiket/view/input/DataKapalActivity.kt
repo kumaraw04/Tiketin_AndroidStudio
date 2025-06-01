@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.azhar.pemesanantiket.R
 import com.azhar.pemesanantiket.databinding.ActivityInputDataBinding
 import com.azhar.pemesanantiket.viewmodel.InputDataViewModel
+import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -21,6 +22,8 @@ class DataKapalActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityInputDataBinding
     private lateinit var inputDataViewModel: InputDataViewModel
+    val uid = FirebaseAuth.getInstance().currentUser?.uid
+
 
     private val strAsal = arrayOf("Jakarta", "Semarang", "Surabaya", "Bali")
     private val strTujuan = arrayOf("Jakarta", "Semarang", "Surabaya", "Bali")
@@ -151,14 +154,51 @@ class DataKapalActivity : AppCompatActivity() {
             } else if (sAsal == sTujuan) {
                 Toast.makeText(this, "Asal dan Tujuan tidak boleh sama!", Toast.LENGTH_LONG).show()
             } else {
-                inputDataViewModel.addDataPemesan(
-                    sNama, sAsal, sTujuan, sTanggal, sTelp, countAnak, countDewasa, 0, sKelas, "1"
-                )
-                Toast.makeText(this, "Booking Tiket berhasil, cek di menu riwayat", Toast.LENGTH_SHORT).show()
-                finish()
+                // Hitung harga berdasarkan kelas
+                val hargaDewasa: Int
+                val hargaAnak: Int
+
+                when (sKelas) {
+                    "Eksekutif" -> {
+                        hargaDewasa = 150000
+                        hargaAnak = 75000
+                    }
+                    "Bisnis" -> {
+                        hargaDewasa = 100000
+                        hargaAnak = 50000
+                    }
+                    else -> { // Ekonomi
+                        hargaDewasa = 70000
+                        hargaAnak = 35000
+                    }
+                }
+
+                val totalHarga = (countDewasa * hargaDewasa) + (countAnak * hargaAnak)
+
+                val uid = FirebaseAuth.getInstance().currentUser?.uid
+                if (uid != null) {
+                    inputDataViewModel.addDataPemesan(
+                        uid,
+                        sNama,
+                        sAsal,
+                        sTujuan,
+                        sTanggal,
+                        sTelp,
+                        countAnak,
+                        countDewasa,
+                        totalHarga,
+                        sKelas,
+                        "1"
+                    )
+                    Toast.makeText(this, "Booking Tiket berhasil, cek di menu riwayat", Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    Toast.makeText(this, "User belum login!", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
+
 
     private fun setStatusBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

@@ -15,12 +15,14 @@ import androidx.lifecycle.ViewModelProvider
 import com.azhar.pemesanantiket.R
 import com.azhar.pemesanantiket.databinding.ActivityInputDataBinding
 import com.azhar.pemesanantiket.viewmodel.InputDataViewModel
+import com.google.firebase.auth.FirebaseAuth
 import java.text.SimpleDateFormat
 import java.util.*
 
 class DataKeretaActivity : AppCompatActivity() {
     private lateinit var binding: ActivityInputDataBinding
     private lateinit var inputDataViewModel: InputDataViewModel
+    val uid = FirebaseAuth.getInstance().currentUser?.uid
 
     private val strAsal = arrayOf("Jakarta", "Semarang", "Surabaya", "Bali")
     private val strTujuan = arrayOf("Jakarta", "Semarang", "Surabaya", "Bali")
@@ -126,37 +128,60 @@ class DataKeretaActivity : AppCompatActivity() {
 
     private fun setInputData() {
         binding.btnCheckout.setOnClickListener {
-            // Ambil data dari input
             sNama = binding.inputNama.text.toString().trim()
             sTanggal = binding.inputTanggal.text.toString().trim()
             sTelp = binding.inputTelepon.text.toString().trim()
 
-            // Debugging Log
-            Log.d("DEBUG", "Nama: $sNama, Tanggal: $sTanggal, Telp: $sTelp, Asal: $sAsal, Tujuan: $sTujuan")
-
-            // Validasi Asal dan Tujuan harus berbeda
-            if (sAsal == sTujuan) {
-                Toast.makeText(this, "Asal dan Tujuan tidak boleh sama!", Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-
-            // Validasi input tidak boleh kosong dan jumlah dewasa minimal 1
-            if (sNama.isEmpty() || sTanggal.isEmpty() || sTelp.isEmpty() || countDewasa <= 0) {
+            if (sNama.isEmpty() || sTanggal.isEmpty() || sTelp.isEmpty() || countDewasa == 0) {
                 Toast.makeText(this, "Mohon lengkapi data pemesanan!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+            } else if (sAsal == sTujuan) {
+                Toast.makeText(this, "Asal dan Tujuan tidak boleh sama!", Toast.LENGTH_LONG).show()
+            } else {
+                // Hitung harga berdasarkan kelas
+                val hargaDewasa: Int
+                val hargaAnak: Int
+
+                when (sKelas) {
+                    "Eksekutif" -> {
+                        hargaDewasa = 150000
+                        hargaAnak = 75000
+                    }
+                    "Bisnis" -> {
+                        hargaDewasa = 100000
+                        hargaAnak = 50000
+                    }
+                    else -> { // Ekonomi
+                        hargaDewasa = 70000
+                        hargaAnak = 35000
+                    }
+                }
+
+                val totalHarga = (countDewasa * hargaDewasa) + (countAnak * hargaAnak)
+
+                val uid = FirebaseAuth.getInstance().currentUser?.uid
+                if (uid != null) {
+                    inputDataViewModel.addDataPemesan(
+                        uid,
+                        sNama,
+                        sAsal,
+                        sTujuan,
+                        sTanggal,
+                        sTelp,
+                        countAnak,
+                        countDewasa,
+                        totalHarga,
+                        sKelas,
+                        "1"
+                    )
+                    Toast.makeText(this, "Booking Tiket berhasil, cek di menu riwayat", Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    Toast.makeText(this, "User belum login!", Toast.LENGTH_SHORT).show()
+                }
             }
-
-            // Simpan data ke ViewModel
-            inputDataViewModel.addDataPemesan(
-                sNama, sAsal, sTujuan, sTanggal, sTelp,
-                countAnak, countDewasa, hargaTotal, sKelas, "1"
-            )
-
-            // Tampilkan pesan sukses dan tutup activity
-            Toast.makeText(this, "Booking Tiket berhasil, cek di menu riwayat", Toast.LENGTH_SHORT).show()
-            finish()
         }
     }
+
 
 
     private fun setStatusBar() {

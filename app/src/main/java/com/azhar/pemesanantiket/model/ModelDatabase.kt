@@ -42,4 +42,6 @@ class ModelDatabase : Serializable {
 
     @ColumnInfo(name = "status")
     lateinit var status: String
+
+    var docId: String? = null
 }

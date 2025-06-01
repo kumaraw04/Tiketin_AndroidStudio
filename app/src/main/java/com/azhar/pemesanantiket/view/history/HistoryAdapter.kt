@@ -14,6 +14,7 @@ class HistoryAdapter(private var modelDatabase: MutableList<ModelDatabase>) :
         modelDatabase.clear()
         modelDatabase.addAll(items)
         notifyDataSetChanged()
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

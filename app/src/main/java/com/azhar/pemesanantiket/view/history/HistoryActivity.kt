@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.azhar.pemesanantiket.databinding.ActivityHistoryBinding
 import com.azhar.pemesanantiket.model.ModelDatabase
 import com.azhar.pemesanantiket.viewmodel.HistoryViewModel
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class HistoryActivity : AppCompatActivity() {
 
@@ -23,6 +25,7 @@ class HistoryActivity : AppCompatActivity() {
     private val historyViewModel: HistoryViewModel by viewModels()
     private val modelDatabaseList: MutableList<ModelDatabase> = ArrayList()
     private lateinit var historyAdapter: HistoryAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,9 +37,73 @@ class HistoryActivity : AppCompatActivity() {
         setStatusBar()
         setToolbar()
         setInitLayout()
-        setViewModel()
+        getDataFromFirestore()
         setUpItemTouchHelper()
     }
+
+    private fun getDataHistory() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val dataList = ArrayList<ModelDatabase>()
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .collection("pemesanan")
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                for (document in querySnapshot) {
+                    val data = document.toObject(ModelDatabase::class.java)
+                    data.docId = document.id
+                    dataList.add(data)
+                }
+
+                historyAdapter.setDataAdapter(dataList)
+
+                if (dataList.isEmpty()) {
+                    binding.tvNotFound.visibility = View.VISIBLE
+                    binding.rvHistory.visibility = View.GONE
+                } else {
+                    binding.tvNotFound.visibility = View.GONE
+                    binding.rvHistory.visibility = View.VISIBLE
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Gagal memuat data dari Firestore", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
+
+    private fun getDataFromFirestore() {
+        val db = FirebaseFirestore.getInstance()
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        db.collection("users")
+            .document(userId)
+            .collection("pemesanan")
+            .get()
+            .addOnSuccessListener { documents ->
+                val listData = mutableListOf<ModelDatabase>()
+                for (doc in documents) {
+                    val item = doc.toObject(ModelDatabase::class.java)
+                    item.docId = doc.id  // ← WAJIB! Untuk simpan ID dokumen Firestore
+                    listData.add(item)
+                }
+
+                if (listData.isEmpty()) {
+                    binding.tvNotFound.visibility = View.VISIBLE
+                    binding.rvHistory.visibility = View.GONE
+                } else {
+                    binding.tvNotFound.visibility = View.GONE
+                    binding.rvHistory.visibility = View.VISIBLE
+                    historyAdapter.setDataAdapter(listData)
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Gagal mengambil data dari Firestore", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 
     private fun setToolbar() {
         setSupportActionBar(binding.toolbar)
@@ -68,19 +135,43 @@ class HistoryActivity : AppCompatActivity() {
 
     private fun setUpItemTouchHelper() {
         val simpleCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.START or ItemTouchHelper.END) {
-            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
                 return false
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val swipedPosition = viewHolder.adapterPosition
                 val modelDatabase = historyAdapter.setSwipeRemove(swipedPosition)
-                historyViewModel.deleteDataById(modelDatabase.uid)
-                Toast.makeText(this@HistoryActivity, "Data yang dipilih sudah dihapus", Toast.LENGTH_SHORT).show()
+
+                val uid = FirebaseAuth.getInstance().currentUser?.uid
+                val docId = modelDatabase.docId
+
+                if (uid != null && docId != null) {
+                    FirebaseFirestore.getInstance()
+                        .collection("users") // ✅ ganti dari "dataPemesan"
+                        .document(uid)
+                        .collection("pemesanan") // ✅ ganti dari "tiket"
+                        .document(docId)
+                        .delete()
+                        .addOnSuccessListener {
+                            Toast.makeText(this@HistoryActivity, "Data berhasil dihapus", Toast.LENGTH_SHORT).show()
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(this@HistoryActivity, "Gagal menghapus data", Toast.LENGTH_SHORT).show()
+                        }
+                } else {
+                    Toast.makeText(this@HistoryActivity, "Data tidak ditemukan", Toast.LENGTH_SHORT).show()
+                }
             }
         }
+
         ItemTouchHelper(simpleCallback).attachToRecyclerView(binding.rvHistory)
     }
+
 
     private fun setStatusBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
