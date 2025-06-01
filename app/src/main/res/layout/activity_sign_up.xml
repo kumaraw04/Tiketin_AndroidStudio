@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:padding="16dp"
+    tools:context=".SignUpActivity">
+
+    <!-- Judul Aplikasi -->
+    <TextView
+        android:id="@+id/tvAppTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:text="Sign Up"
+        android:textColor="@color/green"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Label Email -->
+
+    <!-- Input Email -->
+
+    <!-- Icon Email -->
+
+    <!-- Label Password -->
+
+    <!-- Input Password -->
+
+    <!-- Icon Password -->
+    <EditText
+        android:id="@+id/inputPassword"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/border"
+        android:hint="Enter your password"
+        android:inputType="textPassword"
+        android:paddingStart="40dp"
+        android:paddingEnd="16dp"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvPassword" />
+
+    <TextView
+        android:id="@+id/tvPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Password"
+        android:textColor="@color/black"
+        android:textSize="17sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputEmail" />
+
+    <EditText
+        android:id="@+id/inputEmail"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/border"
+        android:hint="Enter your email"
+        android:inputType="textEmailAddress"
+        android:paddingStart="40dp"
+        android:paddingEnd="16dp"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvEmail" />
+
+    <ImageView
+        android:id="@+id/iconEmail"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintBottom_toBottomOf="@id/inputEmail"
+        app:layout_constraintStart_toStartOf="@id/inputEmail"
+        app:layout_constraintTop_toTopOf="@id/inputEmail"
+        app:layout_constraintVertical_bias="0.615"
+        app:srcCompat="@drawable/baseline_alternate_email_24" />
+
+    <TextView
+        android:id="@+id/tvEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="120dp"
+        android:text="Email"
+        android:textColor="@color/black"
+        android:textSize="17sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvAppTitle" />
+
+    <ImageView
+        android:id="@+id/iconPassword"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintBottom_toBottomOf="@id/inputPassword"
+        app:layout_constraintStart_toStartOf="@id/inputPassword"
+        app:layout_constraintTop_toTopOf="@id/inputPassword"
+        app:layout_constraintVertical_bias="0.615"
+        app:srcCompat="@drawable/baseline_lock_outline_24" />
+
+    <!-- Tombol Buat Akun -->
+
+    <!-- Link ke Halaman Login -->
+
+    <Button
+        android:id="@+id/btnCreateAccount"
+        android:layout_width="260dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="88dp"
+        android:background="@drawable/shape"
+        android:backgroundTint="@color/green"
+        android:text="Create Account"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputPassword" />
+
+    <TextView
+        android:id="@+id/tvSignIn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:minHeight="48dp"
+        android:paddingVertical="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="Already have an account? Sign In"
+        android:textColor="@color/green"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnCreateAccount" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

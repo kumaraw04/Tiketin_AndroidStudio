@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Pemesanan Tiket</string>
+    <string-array name="daftar_kota">
+        <item>Semarang (SRG)</item>
+        <item>Surabaya (SUB)</item>
+        <item>Bali (DPS)</item>
+        <item>Jakarta (HLP)</item>
+    </string-array>
+    <string name="default_web_client_id">203901720124-g9utpdvqg6vr10ple3ug9rdvsrlfk5p7.apps.googleusercontent.com</string>
+    <string name="user_id_placeholder">ID: 123456789</string>
+</resources>
